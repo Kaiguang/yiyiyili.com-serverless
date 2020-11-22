@@ -1,0 +1,111 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  DynamodbTableNameArtworks:
+    Type: String
+  DynamodbTableNameContactMe:
+    Type: String
+  StripeSecretKey:
+    Type: String
+  StripeWebhookSecret:
+    Type: String
+  WebsiteRootUrl:
+    Type: String
+  IamRoleName:
+    Type: String
+
+Globals:
+  Function:
+    Runtime: nodejs12.x
+    Timeout: 3
+    Handler: index.handler
+    Tags:
+      projectName: "yiyiyili.com"
+    Environment:
+      Variables:
+        DYNAMODB_TABLE_NAME_ARTWORKS: !Ref DynamodbTableNameArtworks
+        DYNAMODB_TABLE_NAME_CONTACT_ME: !Ref DynamodbTableNameContactMe
+        STRIPE_SECRET_KEY: !Ref StripeSecretKey
+        STRIPE_WEBHOOK_SECRET: !Ref StripeWebhookSecret
+        WEBSITE_ROOT_URL: !Ref WebsiteRootUrl
+  HttpApi:
+    Tags:
+      projectName: "yiyiyili.com"
+
+Resources:
+  iamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref IamRoleName
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/AmazonSESFullAccess
+      Tags:
+        - Key: "projectName"
+          Value: "yiyiyili.com"
+  httpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration: True
+  getAllArtworksData:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: getAllArtworksData/
+      Role: !GetAtt iamRole.Arn
+      Events:
+        HttpApiEventSource:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref httpApi
+            Path: /all-artworks-data
+            Method: GET
+  createStripeCheckoutSession:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: createStripeCheckoutSession/
+      Role: !GetAtt iamRole.Arn
+      Events:
+        HttpApiEventSource:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref httpApi
+            Path: /create-stripe-checkout-session
+            Method: POST
+  stripeWebhook:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: stripeWebhook/
+      Role: !GetAtt iamRole.Arn
+      Events:
+        HttpApiEventSource:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref httpApi
+            Path: /stripe-webhook
+            Method: POST
+  resetArtworksDb:
+    Type: AWS::Serverless::Function
+    Properties:
+      Role: !GetAtt iamRole.Arn
+      CodeUri: resetArtworksDb/
+      Timeout: 60
+  ContactMeDynamodbTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: time+email
+        Type: String
+      TableName: !Ref DynamodbTableNameContactMe
+      Tags:
+        projectName: "yiyiyili.com"
