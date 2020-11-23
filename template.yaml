@@ -109,3 +109,15 @@ Resources:
       TableName: !Ref DynamodbTableNameContactMe
       Tags:
         projectName: "yiyiyili.com"
+  ContactMeLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ContactMeLambda/
+      Role: !GetAtt iamRole.Arn
+      Events:
+        HttpApiEventSource:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref httpApi
+            Path: /contact-me
+            Method: POST
