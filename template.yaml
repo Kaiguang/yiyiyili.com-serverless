@@ -94,11 +94,11 @@ Resources:
             ApiId: !Ref httpApi
             Path: /stripe-webhook
             Method: POST
-  resetArtworksDb:
+  ResetArtworksDbLambda:
     Type: AWS::Serverless::Function
     Properties:
       Role: !GetAtt iamRole.Arn
-      CodeUri: resetArtworksDb/
+      CodeUri: ResetArtworksDbLambda/
       Timeout: 60
   ContactMeDynamodbTable:
     Type: AWS::Serverless::SimpleTable

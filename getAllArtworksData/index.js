@@ -7,11 +7,6 @@ const scanTable = () => {
   return new Promise((resolve, reject) => {
     const scanParams = {
       TableName,
-      ExpressionAttributeNames: {
-        "#name": "name",
-        "#size": "size",
-      },
-      ProjectionExpression: "id, #name, price, qty, #size",
     };
 
     const scanCallback = (err, data) => {

@@ -55,6 +55,7 @@ const populateTable = () => {
         qty: work.qty,
         name: work.name,
         timeUpdated,
+        imageNames: work.imageNames,
       },
     };
 

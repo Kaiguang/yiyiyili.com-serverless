@@ -22,12 +22,12 @@ $ sam deploy --guided
 
 The DynamoDB table for storing artworks data (product inventory) is not described in the `template.yaml` file, so it won't be created by the `sam deploy`. If you already have this DynamoDB table, it's recommended to keep using it without resetting.
 
-If, however, you don't have this table, or the table data structure changes, you can reset the table by using this Lambda function `resetArtworksDb`.
+If, however, you don't have this table, or the table data structure changes, you can reset the table by using this Lambda function `ResetArtworksDbLambda`.
 
 Invoke the function either by the below shell command, or use the AWS-CLI, or use the AWS web console.
 
 ```shell
-$ sam local invoke resetArtworksDb
+$ sam local invoke ResetArtworksDbLambda
 ```
 
 ## 2. Test in the local development environment
