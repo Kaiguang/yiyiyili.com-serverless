@@ -70,10 +70,10 @@ Resources:
             ApiId: !Ref httpApi
             Path: /all-artworks-data
             Method: GET
-  createStripeCheckoutSession:
+  CreateStripeCheckoutSessionLambda:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: createStripeCheckoutSession/
+      CodeUri: CreateStripeCheckoutSessionLambda/
       Role: !GetAtt iamRole.Arn
       Events:
         HttpApiEventSource:

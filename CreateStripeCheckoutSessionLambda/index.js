@@ -2,7 +2,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const AWS = require("aws-sdk");
 const docClient = new AWS.DynamoDB.DocumentClient();
 
-const allowed_countries = ["CA"];
+const allowed_countries = ["CA", "US"];
 
 const generateStripeCheckoutLineItem = (id) => {
   return new Promise((resolve, reject) => {
